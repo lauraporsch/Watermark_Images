@@ -14,16 +14,18 @@ class Window(Tk):
         width = self.winfo_screenwidth()
         height = self.winfo_screenheight()
         self.geometry("%dx%d" % (width, height))
+        self.current_size = 30
         self.canvas = Canvas(self)
         self.canvas_width = (self.winfo_screenwidth()) / 2
         self.canvas_height = self.winfo_screenheight()
         self.canvas.config(width=self.canvas_width, height=self.canvas_height)
-        self.watermark = 0
+        self.watermark = self.canvas.create_text((self.canvas_width / 2, self.canvas_height / 2), text="",
+                                                 font=(FONT, self.current_size))
         self.text = Entry(self, width=20, font=(FONT, 14))
         self.chosen_font = StringVar(self)
         self.current_font = FONT
         self.chosen_size = Scale(self, orient=HORIZONTAL, length=150, from_=1)
-        self.current_size = 30
+
         self.chosen_rotation = Scale(self, orient=HORIZONTAL, length=150, from_=-180, to=180, resolution=5)
 
     def open_photo(self, img):
@@ -94,9 +96,6 @@ class Window(Tk):
         left_button = Button(position_canvas, text="⬅", command=self.left)
         left_button.config(padx=10, pady=10)
         left_button.grid(column=0, row=2)
-        center_button = Button(position_canvas, text="○", command=self.center)
-        center_button.config(padx=10, pady=10)
-        center_button.grid(column=2, row=2)
         right_button = Button(position_canvas, text="➡", command=self.right)
         right_button.config(padx=10, pady=10)
         right_button.grid(column=4, row=2)
@@ -133,24 +132,20 @@ class Window(Tk):
         self.canvas.itemconfig(self.watermark, angle=selected_rotation)
 
     def up(self):
-        """changes anchor of watermark to south, moves position of watermark up"""
-        self.canvas.itemconfig(self.watermark, anchor=S)
-
-    def center(self):
-        """changes anchor of watermark to center"""
-        self.canvas.itemconfig(self.watermark, anchor=CENTER)
+        """moves watermark up on screen by subtracting 50 from y-coordinate"""
+        self.canvas.move(self.watermark, 0, -50)
 
     def left(self):
-        """changes anchor of watermark to east, moves position of watermark to the left"""
-        self.canvas.itemconfig(self.watermark, anchor=E)
+        """moves watermark left on screen by subtracting 50 from x-coordinate"""
+        self.canvas.move(self.watermark, -50, 0)
 
     def right(self):
-        """changes anchor of watermark to west, moves position of watermark to the right"""
-        self.canvas.itemconfig(self.watermark, anchor=W)
+        """moves watermark right on screen by adding 50 to x-coordinate"""
+        self.canvas.move(self.watermark, 50, 0)
 
     def down(self):
-        """changes anchor of watermark to north, moves position of watermark down"""
-        self.canvas.itemconfig(self.watermark, anchor=N)
+        """moves watermark down on screen by adding 50 to y-coordinate"""
+        self.canvas.move(self.watermark, 0, 50)
 
     def save_file(self):
         """creates a screenshot of the canvas including the watermark and saves it under the chosen file path,
